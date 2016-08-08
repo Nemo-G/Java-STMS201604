@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome</title>
+	<% include cssinclude.ejs %>
+</head>
+
+<body>
+<div id = 'wrapper'>
+	<% include welcome-nav.ejs %>
+
+	<div id = 'page-wrapper'>
+		<div class = 'container-fluid'>
+	        <h1 class="page-header">Welcome <small><%= user.name %>, you are </small> <%= user.position %> <small> of <%= user.addr %></small></h1>
+	        <div class="detail-info row">
+		        <div class="panel panel-system col-md-12">
+					<div class="panel-heading">
+						<h4>Your Calendar</h4>
+					</div>
+					<div class="panel-body">
+						<table class = "table table-hover table-bordered table-condensed table-striped">
+							<thead>
+							</thead>
+							<tbody>
+								<tr>
+									<td><h4 class = "text-center">Date</h4></td>
+									<td><h4 class = "text-center">8:00-10:00</h4></td>
+									<td><h4 class = "text-center">10:00-12:00</h4></td>
+									<td><h4 class = "text-center">13:00-15:00</h4></td>
+									<td><h4 class = "text-center">15:00-17:00</h4></td>
+								</tr>
+								<tr>
+									<td><h5 class = "text-center date"></h5></td>
+									<td><h5 class = "text-center "></h5></td>
+									<td><h5 class = "text-center "></h5></td>
+									<td><h5 class = "text-center "></h5></td>
+									<td><h5 class = "text-center "></h5></td>
+									
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class='col-md-6 col-sm-6'>
+					<div class="panel panel-system">
+						<div class="panel-heading">
+							<h4>Unchecked Transactions</h4>
+						</div>
+						<div class="panel-body">
+							<table class = 'table table-hover table-striped table-bordered'>
+								<thead>
+									<tr>
+										<th><h4 class = 'text-center'>Theme</h4></th>
+										<th><h5 class = 'text-center'></h5></th>
+										<th><h4 class = 'text-center'>Priority</h4></th>
+										<th><h5 class = 'text-center'></h5></th>
+									</tr>
+								</thead>
+							</table>
+							<div id = 'pie-container'></div>
+						</div>
+					</div>
+				</div>
+					
+				<div class='col-md-6 col-sm-6'>
+					<div class="panel panel-system">
+						<div class="panel-heading">
+							<h4>Notifications</h4>
+						</div>
+						<div class="panel-body">
+							<table class = "table table-bordered table-hover table-condensed">
+								<thead>
+									<tr>
+										<th><h4 class = 'text-center'>Theme</h4></th>
+										<th><h5 class = 'text-center'></h5></th>
+										<th><h4 class = 'text-center'>Priority</h4></th>
+										<th><h5 class = 'text-center'></h5></th>
+									</tr>
+								</thead>
+								<tbody class = 'networks-body'>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<% include jsinclude.ejs %>
+<script src='./javascripts/highcharts.src.js'></script>
+
+<script type="text/javascript">
+	var host = config.host;
+	
+	setItem();
+	drawPie();
+	var total;
+	var free;
+
+
+	function setItem()
+	{
+		var url = host + '/rest/v1/system/';
+		//var url = 'http://192.168.3.15:8000/rest/v1/system/';
+		//var url = 'http://192.168.0.103:8000/rest/v1/systems/';
+		$.ajax
+		({
+			url: url,
+			dataType: 'json',
+			success: function(result)
+			{
+				$('h5.hostname').text(result.hostname);
+				$('h5.systemtype').text(result.systemtype);
+				$('h5.release').text(result.release);
+				$('h5.uptime').text(result.uptime);
+				$('h5.loadavg1').text(result.loadavg[0]);
+				$('h5.loadavg2').text(result.loadavg[1]);
+				$('h5.loadavg3').text(result.loadavg[2]);
+
+				total = result.totalmem;
+				free = result.freemem;
+
+				$('h5.total-memory').text(result.totalmem);
+				$('h5.free-memory').text(result.freemem);
+
+				$('h5.model1').text(result.cpus[0].model);
+				$('h5.model2').text(result.cpus[1].model);
+				$('h5.speed1').text(result.cpus[0].speed);
+				$('h5.speed2').text(result.cpus[1].speed);
+				$('h5.user1').text(result.cpus[0].times.user);
+				$('h5.user2').text(result.cpus[1].times.user);
+				$('h5.nice1').text(result.cpus[0].times.nice);
+				$('h5.nice2').text(result.cpus[1].times.nice);
+				$('h5.sys1').text(result.cpus[0].times.sys);
+				$('h5.sys2').text(result.cpus[1].times.sys);
+				$('h5.idle1').text(result.cpus[0].times.idle);
+				$('h5.idle2').text(result.cpus[1].times.idle);
+				$('h5.irq1').text(result.cpus[0].times.irq);
+				$('h5.irq2').text(result.cpus[1].times.irq);
+
+
+				$('.networks-body').empty();
+				for (var key in result.networks)
+				{
+					var size = result.networks[key].length * 3 + 1;
+					$('.networks-body').append(
+						'<tr>'
+							+'<td rowspan = "' + size + '">'
+								+'<h4 class = "text-center">' + key + '</h4>'
+							+'</td>'
+						+'</tr>'
+					);
+					for (var i = 0; i < result.networks[key].length; i ++)
+					{
+						for (var subKey in result.networks[key][i])
+						{
+							$('.networks-body').append(
+								'<tr>'
+									+'<td>'
+										+'<h5 class = "text-center">' + subKey + '</h5>'
+									+'</td>'
+									+'<td>'
+										+'<h5 class = "text-center">' + result.networks[key][i][subKey] + '</h5>'
+									+'</td>'
+								+'</tr>'
+							);
+						}
+					}
+				}
+				setTimeout('setItem()', 1000);
+			}
+		});
+	}
+
+	function drawPie()
+	{
+		var chart;
+	    $('#pie-container').highcharts({
+	        chart: {
+	            plotBackgroundColor: null,
+	            plotBorderWidth: null,
+	            plotShadow: false,
+	            events:
+		        {
+		        	load: function()
+		        	{
+		        		var series = this.series[0];
+		                setInterval(function()
+		                {
+							var data = [];
+							data.push(['Using memory', total - free]);
+							data.push(['Free memory', free]);
+							series.setData(data);
+		                  }, 1000);
+		        	}
+		        }
+	        },
+	        credits:
+            {
+				enabled: false
+			},
+	        colors: ['#FFD700', '#1abc9c'],
+	        title: {
+	            text: 'Memory usage ratio'
+	        },
+	        tooltip: {
+	    	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	        },
+	        plotOptions: {
+	            pie: {
+	                allowPointSelect: true,
+	                cursor: 'pointer',
+	                dataLabels: {
+	                    enabled: true,
+	                    color: '#000000',
+	                    connectorColor: '#000000',
+	                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+	                }
+	            }
+	        },
+	        series: [{
+	            type: 'pie',
+	            name: 'Browser share',
+	            data: [
+	                ['Using memory', total - free],
+	                {
+	                    name: 'Free memory',
+	                    y: free,
+	                    sliced: true,
+	                    selected: true
+	                },
+	            ]
+	        }]
+	    });
+	}
+
+</script>
+
+</body>
+</html>

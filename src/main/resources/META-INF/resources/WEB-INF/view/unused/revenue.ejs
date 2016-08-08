@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Revenue Analysis</title>
+	<% include cssinclude.ejs %>
+</head>
+
+<body>
+<div id = 'wrapper'>
+	<% include welcome-nav.ejs %>
+    <% if (viewaccess.analysis.access_list.indexOf(user.position_id) !== -1){ %>
+    
+	<div id = 'page-wrapper'>
+		<div class = 'container-fluid'>
+			<div class="detail-info row">
+				<div class="panel panel-system col-md-12">
+					<div class="panel-heading">
+						<h4>In-depth Analysis for Revenue</h4>
+					</div>
+					<div class="panel-body">
+						<form action = "/generate" method="post">
+						<div class='col-md-12 col-sm-12'>
+							<div class="panel panel-system">
+								<div class="panel-body">
+									<table class = 'table table-hover table-striped table-bordered'>
+										<thead>
+											<tr>
+												<div class="form-group">
+					                                <label>Choose Items you want to see</label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Items" id="profit" value="profit" checked>Profit
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Items" id="cost" value="cost">Cost
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Items" id="income" value="income">Income
+					                                </label>
+					                            </div>
+											</tr>
+
+											<tr>
+												<div class="form-group">
+					                                <label>Choose Time Scale</label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Scale" id="month" value="month" onclick="changescale()" checked>Month
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Scale" id="quarter" value="quarter" onclick="changescale()">Quarter
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Scale" id="year" value="year" onclick="changescale()">Year
+					                                </label>
+					                            </div>
+											</tr>
+
+											<tr>
+												<label>Within a year or cross years</label>
+											</tr>
+											<tr>
+												<div class="form-group">
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="isCrossYear" id="within" value="within" onclick="ondisable()" checked >Within a year
+					                                </label><br/>
+					                                
+					                                    <input type ="text" class="form-control" name="yearfixed" id = 'yearfixed' placeholder = 'Please specify year' onclick="return false;" onkeydown="return false;">
+					                                <br/>
+
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="isCrossYear" id="cross" value="cross" onclick="ondisable()">Cross years
+					                                					                                    <select name="monthorquarter" id ="monthorquarter" disabled>
+					                                    </select>
+					                                	<!--input type ="text" class="form-control" name="monthorquarter" id ="monthorquarter" placeholder = 'Please specify month or quarter' disabled-->
+					                            	</label>
+					                            </div>
+											</tr>
+                                            
+                                            <tr>
+												<div class="form-group">
+					                                <label>Choose Perspective</label>
+					                                <% if (user.position_id === '1'){ %>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="perspective" id="Region" value="region" >Region
+					                                </label>
+					                                <% } %>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="perspective" id="Hotel" value="hotel" checked>Hotel
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="perspective" id="Detail" value="detail">Detail
+					                                </label>
+					                            </div>
+											</tr>
+											<tr>
+												<button type="button" class="btn btn-lg btn-primary" onclick="generate()">Generate Report</button>
+											</tr>
+											
+
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</form>
+					
+						<div class='col-md-12 col-sm-6'>
+							<div class="panel panel-system">
+								<div class="panel-body">
+									<div id="chartshow">
+
+									</div>
+									<div id='changetype' style='display:none'>
+									<button class="change" index="line">Line</button>
+									<button class="change" index="column">Column</button>
+									<button class="change" index="pie">Pie</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<% } %>
+
+<% include jsinclude.ejs %>
+<script src='./javascripts/highcharts.src.js'></script>
+<script>
+	function ondisable(){
+		if (document.getElementById("within").checked){
+			document.getElementById("monthorquarter").disabled = true;
+			document.getElementById("monthorquarter").innerHTML="";
+			document.getElementById("yearfixed").disabled = false;
+		}else{
+			document.getElementById("monthorquarter").disabled = false;
+			document.getElementById("yearfixed").disabled = true;
+			document.getElementById("yearfixed").value = "";
+		}
+        changescale();
+	}
+
+	function changescale(){
+		if (document.getElementById("month").checked)
+			document.getElementById("monthorquarter").innerHTML =  "<option> Jan</option><option> Feb</option><option> Mar</option><option> Apr</option><option> May</option><option> Jun</option><option> Jul</option><option> Aug</option><option> Sep</option><option> Oct</option><option> Nov</option><option> Dec</option>";
+		else if(document.getElementById("quarter").checked)
+			document.getElementById("monthorquarter").innerHTML =  "<option> Q1</option><option> Q2</option><option> Q3</option><option> Q4</option>";
+		else
+			document.getElementById("monthorquarter").innerHTML = "<option> year</option>";
+
+	}
+
+
+	function generate(){
+		if (document.getElementById("monthorquarter").value ==="" && document.getElementById("yearfixed").value === ""){
+			alert("Input should not be empty!");
+		}else{
+			$.ajax({
+				url: '/generate',
+				type: 'POST',
+				data: JSON.stringify(formtojson(document.forms[0])), 
+				contentType: "application/json",
+				//dataType: 'json',//set expected data type to be received
+				async: false,
+                                error: function(request){
+					console.log('error');
+				},
+				success: function(result){
+					console.log(result);
+					if (result.toString().indexOf('Data Not Found') !== -1){
+						$('#chartshow').html( "<h4 style='color:red'> Data Not Found</h4>" );
+						$('#changetype')[0].style.display = 'none';
+						//datafill();
+					}
+					else{
+
+						console.log(result);
+
+						datafill(result);
+					}
+				}
+			});
+
+		}
+		
+	}
+	//parse form data to json format so as to submit using ajax
+	function formtojson (frm) {
+	    var o = {};
+	    var a = $(frm).serializeArray();
+	    $.each(a, function () {
+	        if (o[this.name] !== undefined) {
+	            if (!o[this.name].push) {
+	                o[this.name] = [o[this.name]];
+	            }
+	            o[this.name].push(this.value || '');
+	        } else {
+	            o[this.name] = this.value || '';
+	        }
+	    });
+
+	    return o;
+	}
+
+	
+    var options = {	
+	        chart: {
+	            type: '' //data.type
+	        },
+	        credits:{
+				enabled: false
+			},
+	        title: {
+	            text: ''//data.title
+	        },
+	        xAxis: {
+	            categories: []//data.category
+	        },
+	        yAxis: {
+	            min: 0,
+	            title: {
+	                text: '$USD'
+	            }
+	        },
+	        tooltip: {
+	            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+	            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+	                '<td style="padding:0"><b>{point.y:.1f} USD</b></td></tr>',
+	            footerFormat: '</table>',
+	            shared: true,
+	            useHTML: true
+	        },
+	        series: []//data.table
+	    };
+
+
+			
+    function datafill(data) {
+    	options.chart.type = data.charttype;
+    	content = JSON.parse(data['data']);
+    	//console.log(content);
+    	
+    	options.title.text = content.title;
+
+    	options.xAxis.categories = content.category;
+    	//console.log(options.series);
+
+    	//parse string formatted statistics to float
+    	//2 types of data to parse
+    	for (var i=0;i<content.table.length;++i)
+    		for (var j=0;j<content.table[i].data.length;++j)
+    			if (typeof(content.table[i].data[j]) === 'string')
+    				content.table[i].data[j] = parseFloat(content.table[i].data[j]);
+    			else
+    				content.table[i].data[j][1] = parseFloat(content.table[i].data[j][1]);
+    	
+    	options.series =  content.table;
+    	//console.log(content.table);
+		//show buttons to change form of chart, can be bar , line ,pie
+		$('#changetype')[0].style.display = '';
+		$('#chartshow').highcharts(options);
+	}
+
+	$.each(['line', 'column', 'pie'], function (i, type) {
+        $('.change[index=' + type+']').click(function () {
+            options.chart.type =  type;
+            $('#chartshow').highcharts(options);
+        });
+    });
+</script>
+	
+
+</body>
+</html>

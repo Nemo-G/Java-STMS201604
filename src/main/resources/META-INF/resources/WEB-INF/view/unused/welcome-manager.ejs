@@ -1,0 +1,158 @@
+<div class="detail-info row">
+    <div class="panel panel-system col-md-12">
+		<div class="panel-heading">
+			<h4>Your Calendar</h4>
+		</div>
+		<div class="panel-body">
+			<table class = "table table-hover table-bordered table-condensed table-striped" id="calendar-table">
+				<thead>
+					<tr>
+						<td><h4 class = "text-center">Date</h4></td>
+						<td><h4 class = "text-center">8:00-10:00</h4></td>
+						<td><h4 class = "text-center">10:00-12:00</h4></td>
+						<td><h4 class = "text-center">13:00-15:00</h4></td>
+						<td><h4 class = "text-center">15:00-17:00</h4></td>
+					</tr>
+				</thead>
+				<tbody>
+					
+					<tr>
+						<td><h5 class = "text-center date">2015/8/13</h5></td>
+						<td><h5 class = "text-center "></h5>Meeting with Finance </td>
+						<td><h5 class = "text-center "></h5>Meeting with Accounting </td>
+						<td><h5 class = "text-center "></h5>Stuff Rating Deadline</td>
+						<td><h5 class = "text-center "></h5></td>
+					</tr>
+
+					<tr>
+						<td><h5 class = "text-center date">2015/8/12</h5></td>
+						<td><h5 class = "text-center "></h5>Meeting with HR </td>
+						<td><h5 class = "text-center "></h5>Meeting with Supplier  </td>
+						<td><h5 class = "text-center "></h5>Monthly report Deadline</td>
+						<td><h5 class = "text-center "></h5></td>
+					</tr>
+
+					<tr>
+						<td><h5 class = "text-center date">2015/8/13</h5></td>
+						<td><h5 class = "text-center "></h5>Meeting with Finance </td>
+						<td><h5 class = "text-center "></h5>Meeting with Accounting </td>
+						<td><h5 class = "text-center "></h5>Stuff Rating Deadline</td>
+						<td><h5 class = "text-center "></h5></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="text-right">
+	            <a href="#">View More Calendar <i class="fa fa-arrow-circle-right"></i></a>
+	        </div>
+
+		</div>
+	</div>
+	<div class='col-md-8 col-sm-6'>
+		<div class="panel panel-system">
+			<div class="panel-heading">
+				<h4>Unchecked Transactions</h4>
+			</div>
+			<div class="panel-body  table-responsive">
+				<table class = "table table-hover table-striped table-bordered" id="transaction-table">
+					<thead>
+						<tr>
+							<th>Theme</th>
+							<th>Deadline</th>
+							<th>Urgent Level</th>
+							<th>Submitter</th>
+							<th>Progress</th>
+						</tr>
+					</thead>
+				
+					<tbody>
+						
+						<tr class="warning">
+							<td>Hotel Finance Report</td>
+							<td> 2015/9/1 </td>
+							<td> Medium </h5</td>
+							<td> Hotel River Stone</td>
+							<td> Unchecked</td>
+						</tr>
+
+						<tr class="danger">
+							<td>HR Rating</td>
+							<td>2015/8/15 </td>
+							<td> High  </td>
+							<td>HR System </td>
+							<td> Unchecked</td>
+						</tr>
+
+						<tr class="active">
+							<td>New Quarter Sales Plan</td>
+							<td>2015/9/1 </td>
+							<td>Low</td>
+							<td>Secretary</td>
+							<td>Processing</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="text-right">
+		            <a href="/transaction">View All Transactions <i class="fa fa-arrow-circle-right"></i></a>
+		        </div>
+
+			</div>
+		</div>
+	</div>
+		
+	<div class='col-md-4 col-sm-6'>
+		<div class="panel panel-system">
+			<div class="panel-heading">
+				<h4>Incoming Notes</h4>
+			</div>
+			<div class="panel-body">
+				<div class="list-group">
+                    <a href="#" class="list-group-item">
+                        <span class="badge">just now</span>
+                        <i class="fa fa-fw fa-calendar"></i> Calendar updated
+                    </a>
+                    <a href="#" class="list-group-item">
+                        <span class="badge">4 minutes ago</span>
+                        <i class="fa fa-fw fa-comment"></i> Report submitted
+                    </a>
+                    <a href="#" class="list-group-item">
+                        <span class="badge">23 minutes ago</span>
+                        <i class="fa fa-fw fa-truck"></i> Order 392 shipped
+                    </a>
+                    <a href="#" class="list-group-item">
+                        <span class="badge">46 minutes ago</span>
+                        <i class="fa fa-fw fa-money"></i> Invoice 653 has been paid
+                    </a>
+                    <a href="#" class="list-group-item">
+                        <span class="badge">2 hours ago</span>
+                        <i class="fa fa-fw fa-check"></i> Completed task: "pick up dry cleaning"
+                    </a>
+                    <a href="#" class="list-group-item">
+                        <span class="badge">two days ago</span>
+                        <i class="fa fa-fw fa-check"></i> Completed task: "fix error on sales page"
+                    </a>
+                 </div>
+				<!--table class = "table table-bordered table-hover table-condensed">
+					<thead>
+						<tr>
+							<th><h4 class = 'text-center'>Theme</h4></th>
+							<th><h4 class = 'text-center'>Deadline</h4></th>
+							<th><h4 class = 'text-center'>Priority</h4></th>
+						</tr>
+					</thead>
+					<tbody class = 'networks-body'>
+					</tbody>
+				</table-->
+				<div class="text-right">
+		            <a href="#">View All Activity <i class="fa fa-arrow-circle-right"></i></a>
+		        </div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+var tb = new TableSorter("transaction-table");
+</script>

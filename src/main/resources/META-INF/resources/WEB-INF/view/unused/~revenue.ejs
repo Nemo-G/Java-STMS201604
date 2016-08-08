@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Revenue Analysis</title>
+	<% include cssinclude.ejs %>
+</head>
+
+<body>
+<div id = 'wrapper'>
+	<% include welcome-nav.ejs %>
+    <% if (viewaccess.analysis.access_list.indexOf(user.position_id) !== -1){ %>
+    
+	<div id = 'page-wrapper'>
+		<div class = 'container-fluid'>
+			<div class="detail-info row">
+				<div class="panel panel-system col-md-12">
+					<div class="panel-heading">
+						<h4>In-depth Analysis for Revenue</h4>
+					</div>
+					<div class="panel-body">
+						<form action = "/generate" method="post">
+						<div class='col-md-12 col-sm-12'>
+							<div class="panel panel-system">
+								<div class="panel-body">
+									<table class = 'table table-hover table-striped table-bordered'>
+										<thead>
+											<tr>
+												<div class="form-group">
+					                                <label>Choose Items you want to see</label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Items" id="profit" value="profit" checked>Profit
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Items" id="cost" value="cost">Cost
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Items" id="income" value="income">Income
+					                                </label>
+					                            </div>
+											</tr>
+
+											<tr>
+												<div class="form-group">
+					                                <label>Choose Time Scale</label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Scale" id="month" value="month" checked>Month
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Scale" id="quarter" value="quarter">Quarter
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="Scale" id="year" value="year">Year
+					                                </label>
+					                            </div>
+											</tr>
+
+											<tr>
+												<label>Within a year or cross years</label>
+											</tr>
+											<tr>
+												<div class="form-group">
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="isCrossYear" id="within" value="within" onclick="ondisable()" checked >Within a year
+					                                </label><br/>
+					                                
+					                                    <input type ="text" class="form-control" name="yearfixed" id = 'yearfixed' placeholder = 'Please specify year'>
+					                                <br/>
+
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="isCrossYear" id="cross" value="cross" onclick="ondisable()">Cross years
+					                                </label><br/>
+					                                
+					                                	<input type ="text" class="form-control" name="monthorquarter" id ="monthorquarter" placeholder = 'Please specify month or quarter' disabled>
+					                             <br/>
+					                            </div>
+											</tr>
+                                            
+                                            <tr>
+												<div class="form-group">
+					                                <label>Choose Perspective</label>
+					                                <% if (user.position_id === '1'){ %>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="perspective" id="Region" value="region" >Region
+					                                </label>
+					                                <% } %>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="perspective" id="Hotel" value="hotel" checked>Hotel
+					                                </label>
+					                                <label class="radio-inline">
+					                                    <input type="radio" name="perspective" id="Detail" value="detail">Detail
+					                                </label>
+					                            </div>
+											</tr>
+											<tr>
+												<button type="button" class="btn btn-lg btn-primary" onclick="generate()">Generate Report</button>
+											</tr>
+											
+
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</form>
+					
+						<div class='col-md-12 col-sm-6'>
+							<div class="panel panel-system">
+								<div class="panel-body">
+									<div id="chartshow">
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<% } %>
+
+<% include jsinclude.ejs %>
+<script src='./javascripts/highcharts.src.js'></script>
+<script>
+	function ondisable(){
+		if (document.getElementById("within").checked){
+			document.getElementById("monthorquarter").disabled = true;
+			document.getElementById("monthorquarter").value = "";
+			document.getElementById("yearfixed").disabled = false;
+		}else{
+			document.getElementById("monthorquarter").disabled = false;
+			document.getElementById("yearfixed").disabled = true;
+			document.getElementById("yearfixed").value = "";
+		}
+
+	}
+	function generate(){
+		if (document.getElementById("monthorquarter").value ==="" && document.getElementById("yearfixed").value === ""){
+			alert("Input should not be empty!");
+		}else{
+			$.ajax({
+				url: '/generate',
+				type: 'POST',
+				data: JSON.stringify(formtojson(document.forms[0])), 
+				contentType: "application/json",
+				//dataType: 'json',//set expected data type to be received
+				async: false,
+                                error: function(request){
+					console.log('error');
+				},
+				success: function(result){
+					console.log(result);
+					if (result.toString().indexOf('Data Not Found') !== -1)
+						$('#chartshow').html( "<h4 style='color:red'> Data Not Found</h4>" );
+					else
+						datafill(result);
+				}
+			});
+
+		}
+		
+	}
+	
+	formtojson = function (frm) {
+	    var o = {};
+	    var a = $(frm).serializeArray();
+	    $.each(a, function () {
+	        if (o[this.name] !== undefined) {
+	            if (!o[this.name].push) {
+	                o[this.name] = [o[this.name]];
+	            }
+	            o[this.name].push(this.value || '');
+	        } else {
+	            o[this.name] = this.value || '';
+	        }
+	    });
+
+	    return o;
+	}
+
+	datafill = function (data) {
+            $('#chartshow').highcharts({	
+	        chart: {
+	            type: 'column' //data.type
+	        },
+	        credits:{
+				enabled: false
+			},
+	        title: {
+	            text: 'Monthly Average'//data.title
+	        },
+	        xAxis: {
+	            categories: [
+	                'Jan',
+	                'Feb',
+	                'Mar',
+	                'Apr',
+	                'May',
+	                'Jun',
+	                'Jul',
+	                'Aug',
+	                'Sep',
+	                'Oct',
+	                'Nov',
+	                'Dec'
+	            ]//data.category
+	        },
+	        yAxis: {
+	            min: 0,
+	            title: {
+	                text: '$(USD)'
+	            }
+	        },
+	        tooltip: {
+	            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+	            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+	                '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+	            footerFormat: '</table>',
+	            shared: true,
+	            useHTML: true
+	        },
+	        plotOptions: {
+	            
+	        },
+	        series: [{
+	            name: 'Tokyo',
+	            data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+
+	        }, {
+	            name: 'New York',
+	            data: [83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3]
+
+	        }, {
+	            name: 'London',
+	            data: [48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3, 51.2]
+
+	        }, {
+	            name: 'Berlin',
+	            data: [42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1]
+
+	        }]
+	    });
+	}		
+
+</script>
+	
+
+</body>
+</html>

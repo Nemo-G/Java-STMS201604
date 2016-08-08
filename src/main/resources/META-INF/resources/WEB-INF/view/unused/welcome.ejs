@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome</title>
+	<% include jsinclude.ejs %>
+	<% include cssinclude.ejs %>
+</head>
+
+<body>
+<div id = 'wrapper'>
+	<% include welcome-nav.ejs %>
+
+	<div id = 'page-wrapper'>
+		<div class = 'container-fluid'>
+	        <h1 class="page-header">Welcome <small><%= user.name %>, you are </small> <%= user.position %> <small> of <%= user.addr %></small></h1>
+	        <% if (viewaccess.bodynote.access_list.indexOf(user.position_id) !== -1){ %>
+            <% include welcome-manager.ejs %>
+            <% }else{ %>
+            <% include welcome-other.ejs %>
+            <% } %>
+		</div>
+	</div>
+</div>
+
+
+
+
+</body>
+</html>

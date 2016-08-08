@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="sample-project">
+		<class>com.worksap.stm2016.model.Attendance</class>
+		<class>com.worksap.stm2016.model.Skillset</class>
+		<class>com.worksap.stm2016.model.Employeelist</class>
+		<class>com.worksap.stm2016.model.Skilltable</class>
+		<class>com.worksap.stm2016.model.Ticket</class>
+		<class>com.worksap.stm2016.model.Ticketrecord</class>
+		<class>com.worksap.stm2016.model.Userlist</class>
+		<class>com.worksap.stm2016.model.Utypelist</class>
+		<class>com.worksap.stm2016.model.Worktypelist</class>
+	</persistence-unit>
+</persistence>
